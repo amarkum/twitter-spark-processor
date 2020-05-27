@@ -1,0 +1,40 @@
+@namespace("com.twitter.spark.processor.models")
+
+protocol TwitterRecordProtocol {
+
+/**
+ * A Tweet Record
+ */
+  record TweetRecord {
+
+  /**
+   * ID of the Tweet
+   */
+    string tweetID;
+
+  /**
+   * Text Description of the Tweet
+   */
+    union {null, string} tweetDescription = null;
+
+  /**
+   * Text Description of the Tweet
+   */
+    union {null, string} creationDtTm = null;
+
+  /**
+   * Text Description of the Tweet
+   */
+    union {null, string} tweetUserID = null;
+
+  /**
+    * Text Description of the Tweet
+    */
+    union {null, string} tweetUserName = null;
+
+  /**
+    * Text Description of the Tweet
+    */
+    union {null, string} tweetUserLocation = null;
+  }
+}
