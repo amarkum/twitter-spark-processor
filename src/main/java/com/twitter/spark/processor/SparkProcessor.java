@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class SparkProcessor {
-    static DatumWriter<TweetRecord> userDatumWriter = new SpecificDatumWriter<>(TweetRecord.class);
-    static DataFileWriter<TweetRecord> dataFileWriter = new DataFileWriter<>(userDatumWriter);
+    static DatumWriter <TweetRecord> userDatumWriter = new SpecificDatumWriter<> (TweetRecord.class);
+    static DataFileWriter <TweetRecord> dataFileWriter = new DataFileWriter<> (userDatumWriter);
 
     public static void main(String[] args) throws InterruptedException, IOException {
         dataFileWriter.create(TweetRecord.getClassSchema(), new File("src/main/resources/tweets.avro"));
@@ -41,8 +41,8 @@ public class SparkProcessor {
         System.out.println("Enter Topics to follow");
         Collection<String> topics = new ArrayList<>();
         Scanner in = new Scanner(System.in);
-        topics.add(in.next());
-        topics.add(in.next());
+        topics.add( in .next());
+        topics.add( in .next());
 
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
@@ -50,39 +50,37 @@ public class SparkProcessor {
 
         JavaStreamingContext streamingContext = new JavaStreamingContext(sparkConf, Durations.seconds(1));
         streamingContext.sparkContext().setLogLevel("ERROR");
-        JavaInputDStream<ConsumerRecord<String, String>> inputDStream = KafkaUtils.createDirectStream(streamingContext, LocationStrategies.PreferConsistent(), ConsumerStrategies.<String, String>Subscribe(topics, kafkaParams));
+        JavaInputDStream <ConsumerRecord<String, String >> inputDStream = KafkaUtils.createDirectStream(streamingContext, LocationStrategies.PreferConsistent(), ConsumerStrategies.Subscribe(topics, kafkaParams));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Shut Gracefully | Stopping Application\n");
-            try {
-                dataFileWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Data File Writer Closed | Done!");
+                System.out.println("Shut Gracefully | Stopping Application\n");
+        try {
+            dataFileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Data File Writer Closed | Done!");
         }));
 
         inputDStream.foreachRDD(rdd -> rdd.foreach(record -> {
-                    System.out.printf("topic = %s, partition = %d, offset = %d, key = %s",
-                            record.topic(), record.partition(), record.offset(), record.key());
-                    System.out.println("\n\n"+record.value());
+                System.out.printf("topic = %s, partition = %d, offset = %d, key = %s",
+                        record.topic(), record.partition(), record.offset(), record.key());
+        System.out.println("\n\n" + record.value());
 
-                    JSONObject parentJsonObject = new JSONObject(record.value());
-                    JSONObject userJsonObject = parentJsonObject.getJSONObject("user");
+        JSONObject parentJsonObject = new JSONObject(record.value());
+        JSONObject userJsonObject = parentJsonObject.getJSONObject("user");
 
-                    dataFileWriter.append(TweetRecord.newBuilder()
-                            .setTweetID(parentJsonObject.getString("id"))
-                            .setTweetDescription(parentJsonObject.getString("text").replace("\n", " ").replace("\t", "  "))
-                            .setCreationDtTm(parentJsonObject.getString("created_at"))
-                            .setTweetUserID(userJsonObject.getString("id"))
-                            .setTweetUserName(userJsonObject.getString("name"))
-                            .setTweetUserLocation(userJsonObject.getString("location"))
-                            .build());
-                })
-        );
+        dataFileWriter.append(TweetRecord.newBuilder()
+                .setTweetID(parentJsonObject.getString("id"))
+                .setTweetDescription(parentJsonObject.getString("text").replace("\n", " ").replace("\t", "  "))
+                .setCreationDtTm(parentJsonObject.getString("created_at"))
+                .setTweetUserID(userJsonObject.getString("id"))
+                .setTweetUserName(userJsonObject.getString("name"))
+                .setTweetUserLocation(userJsonObject.getString("location"))
+                .build());
+        }));
 
         streamingContext.start();
         streamingContext.awaitTermination();
     }
 }
-
