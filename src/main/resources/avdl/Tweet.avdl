@@ -18,22 +18,22 @@ protocol TwitterRecordProtocol {
     union {null, string} tweetDescription = null;
 
   /**
-   * Text Description of the Tweet
+   * Creation Date & Time of the Tweet
    */
     union {null, string} creationDtTm = null;
 
   /**
-   * Text Description of the Tweet
+   * User ID of the Tweet
    */
     union {null, string} tweetUserID = null;
 
   /**
-    * Text Description of the Tweet
+    * User Name of the Tweet
     */
     union {null, string} tweetUserName = null;
 
   /**
-    * Text Description of the Tweet
+    * User Location of the Tweet
     */
     union {null, string} tweetUserLocation = null;
   }
